@@ -1,0 +1,12 @@
+body {
+	background-color: black;
+	color: white;
+	color-scheme: dark !important;
+	
+	font-family: Arial, sans-serif;
+}
+
+#text {
+	font-size: 1000%;
+	margin: 0;
+}
