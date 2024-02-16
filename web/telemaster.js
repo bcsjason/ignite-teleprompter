@@ -8,6 +8,8 @@ let options = {
 	fontSize: 48,
 	fontColor: "white",
 	backgroundColor: "black",
+	playing: false,
+	percent: 0
 }
 
 socket.addEventListener("open", (event) => {
@@ -33,29 +35,8 @@ socket.addEventListener("message", (event) => {
 	document.querySelector("#fontSize").value = options.fontSize
 	document.querySelector("#fontColor").value = options.fontColor
 	document.querySelector("#backgroundColor").value = options.backgroundColor
-
-	// Update clients table
-
-	let table = document.querySelector("table")
-
-	// Remove all children
-	while (table.firstChild) {
-		table.removeChild(table.firstChild)
-	}
-
-	// Add new clients
-	clients.forEach((client) => {
-		let row = document.createElement("tr")
-		row.innerHTML = `
-		<td>${client.id} ${client.type == "telemaster" ? "(MASTER)" : "(PROMPTER)"}</td>
-		<td>${client.ip}</td>
-		<td>${client.joined}</td>
-		<td><input id="playing_${client.id}" oninput="changeStatus(${client.id})" type="checkbox" checked=${client.status.playing} /></td>
-		<td><input id="progress_${client.id}" oninput="changeStatus(${client.id})" type="range" min="0" max="100" value="${client.status.percent}"></input></td>
-		
-		`
-		table.appendChild(row)
-	})
+	document.querySelector("#playing").checked = options.playing
+	document.querySelector("#progress").value = options.percent
 })
 
 // Input events
@@ -90,17 +71,12 @@ document.querySelector("#backgroundColor").oninput = (event) => {
 	socket.send(JSON.stringify({"type": "updateOption", "key": "backgroundColor", "value": event.target.value}))
 }
 
-// Class events
+document.querySelector("#playing").oninput = (event) => {
+	options.playing = event.target.checked
+	socket.send(JSON.stringify({"type": "updateOption", "key": "playing", "value": event.target.checked}))
+}
 
-const changeStatus = (id) => {
-	console.log(`changePlaying(${id}, ${document.querySelector(`#playing_${id}`).checked}, ${document.querySelector(`#progress_${id}`).value})`)
-
-	let client = clients.find((client) => client.id === id)
-	client.status.playing = document.querySelector(`#playing_${id}`).checked
-	client.status.percent = document.querySelector(`#progress_${id}`).value
-	socket.send(JSON.stringify({
-		type: "updateStatus",
-		client_id: id,
-		status: client.status
-	}))
+document.querySelector("#progress").oninput = (event) => {
+	options.percent = event.target.value
+	socket.send(JSON.stringify({"type": "updateOption", "key": "percent", "value": event.target.value}))
 }

@@ -7,8 +7,7 @@ let options = {
 	fontSize: 48,
 	fontColor: "white",
 	backgroundColor: "black",
-}
-let telemarketerStatus = {
+
 	playing: false,
 	percent: 0
 }
@@ -25,14 +24,6 @@ socket.addEventListener("message", (event) => {
 		options[data.key] = data.value
 	} else if (data.type == "replaceOptions") {
 		options = data.options
-	} else if (data.type == "replaceStatus") {
-		telemarketerStatus = {
-			playing: false,
-			percent: data.status.percent
-		}
-		window.scrollTo(0, data.status.percent / 100 * document.body.scrollHeight)
-		scrollPosition = data.status.percent / 100 * document.body.scrollHeight
-		telemarketerStatus.playing = data.status.playing
 	}
 
 	document.querySelector("#text").value = options.text
@@ -43,25 +34,38 @@ socket.addEventListener("message", (event) => {
 	document.querySelector("#endtext").style.color = options.fontColor
 
 	document.body.style.backgroundColor = options.backgroundColor
+
+	window.scrollTo(0, options.percent / 100 * document.body.scrollHeight)
+	scrollPosition = options.percent / 100 * document.body.scrollHeight
+	options.playing = options.playing
 })
 
 let scrollPosition = 0
 window.onload = () => {
 	setInterval(() => {
-		if (telemarketerStatus.playing === true) {
+		if (options.playing === true) {
 			window.scrollTo(0, scrollPosition += Number(options.speed))
 			console.log(scrollPosition)
-			telemarketerStatus.percent = Math.round(scrollPosition / document.body.scrollHeight * 100)
+			options.percent = Math.round(scrollPosition / document.body.scrollHeight * 100)
+
+			if (scrollPosition >= document.body.scrollHeight) {
+				options.playing = false
+				socket.send(JSON.stringify({
+					type: "updateOption",
+					key: "playing",
+					value: false
+				}))
+			}
 		}
 	}, 10)
 
 	setInterval(() => {
-		if (telemarketerStatus.playing === true) {
+		if (options.playing === true) {
 			socket.send(JSON.stringify({
-				type: "updateStatus",
-				status: telemarketerStatus
+				type: "updatePercent",
+				value: options.percent
 			}))
-			console.log(telemarketerStatus)
+			console.log(options)
 		}
 
 		document.querySelector("#text").innerText = options.text

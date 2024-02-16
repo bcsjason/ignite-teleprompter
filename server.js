@@ -27,6 +27,8 @@ let options = {
 	fontSize: 48,
 	fontColor: "white",
 	backgroundColor: "black",
+	playing: false,
+	percent: 0
 }
 
 wss.on("connection", (ws, req) => {
@@ -53,10 +55,6 @@ wss.on("connection", (ws, req) => {
 		ip: ip,
 		joined: joined,
 		type: type,
-		status: {
-			playing: false,
-			percent: 0
-		}
 	})
 
 	// Tell all telemasters about the new client
@@ -113,34 +111,16 @@ wss.on("connection", (ws, req) => {
 					}))
 				}
 			})
-		} else if (json.type === "updateStatus") {
-			if (json.client_id === undefined) { // Coming from a teleprompter
-				clients[clients.findIndex((client) => client.ws === ws)].status.playing = json.status.playing
-				clients[clients.findIndex((client) => client.ws === ws)].status.percent = json.status.percent
-			} else if (json.client_id !== undefined) { // Coming from a telemaster
-				clients[clients.findIndex((client) => client.id === json.client_id)].status.playing = json.status.playing
-				clients[clients.findIndex((client) => client.id === json.client_id)].status.percent = json.status.percent
-			}
+		} else if (json.type === "updatePercent") {
+			options.percent = json.value
+			clients.forEach((client) => {
+				// Broadcast to all telemasters
 
-			// Tell all telemasters except the sender
-			clients.filter((client) => client.type === "telemaster").forEach((client) => {
-				if (client.ws !== ws) {
+				if (client.type === "telemaster") {
 					client.ws.send(JSON.stringify({
-						type: "replaceClients",
-						clients: sanitizeClientArray(clients)
-					}))
-				}
-			})
-
-			// Tell all prompters except the sender
-			clients.filter((client) => client.type === "teleprompter").forEach((client) => {
-				if (client.ws !== ws) {
-					client.ws.send(JSON.stringify({
-						type: "replaceStatus",
-						status: {
-							playing: json.status.playing,
-							percent: json.status.percent
-						}
+						type: "updateOption",
+						key: "percent",
+						value: json.value
 					}))
 				}
 			})

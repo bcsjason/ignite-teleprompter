@@ -33,42 +33,12 @@
 
 
 		<h1>Teleprompters</h1>
-		<table>
-			<tr>
-				<td>
-					ID
-				</td>
-				<td>
-					Joined At
-				</td>
-				<td>
-					IP Address
-				</td>
-				<td>
-					Playing
-				</td>
-				<td>
-					Progress
-				</td>
-			</tr>
-			<tr>
-				<td>
-					ALL
-				</td>
-				<td>
-					N/A
-				</td>
-				<td>
-					N/A
-				</td>
-				<td>
-					<input class="playing" type="checkbox" />
-				</td>
-				<td>
-					<input class="progress" type="range" min="0" max="100" value="0"></input>
-				</td>
-			</tr>
-		</table>
+
+		<b>Playing: </b>
+		<input id="playing" type="checkbox" />
+		<br>
+		<b>Progress: </b>
+		<input id="progress" type="range" min="0" max="100" value="0"></input>
 
 		
 		<script src="./telemaster.js"></script>
