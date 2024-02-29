@@ -2,45 +2,92 @@
 <html>
 	<head>
 		<title>Ignite Media - Teleprompter</title>
+		<link rel="icon" href="icon.ico" type="image/x-icon">
+
+		<meta charset="utf-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link rel="stylesheet" href="./bootstrap.min.css">
 		<link rel="stylesheet" href="./telemaster.css">
 	</head>
 	<body>
-		<h1>Text</h1>
+		<header class="p-3 text-bg-dark">
+			<div class="container">
+			  <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+				<img src="./icon.png" width="5%" float="left">
+		
+				<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+					<h3>Ignite Media - Teleprompter Manager</h3>
+				</ul>
+		
+				<div class="text-end">
+				  <form>
+					<a target="_blank" href="/teleprompter.html" type="button" class="btn btn-primary">Open Teleprompter</a>
+				  </form>
+				</div>
+			  </div>
+			</div>
+		  </header>
+
 		<textarea id="text" name="text" rows="20" cols="70">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</textarea>
 
-		<h1>Options</h1>
-		<b>Speed: </b>
-		<input id="speed" type="range" min="0" max="10" step="0.25" />
-		<br><br>
-		<b>Font:</b>
-		<select id="font">
-			<option value="Arial">Arial</option>
-			<option value="Times New Roman">Times New Roman</option>
-			<option value="Courier New">Courier New</option>
-			<option value="Comic Sans MS">Comic Sans MS</option>
-			<option value="Verdana">Verdana</option>
-		</select>
-		<br>
-		<b>Font Size: </b>
-		<input id="fontSize" type="range" min="12" max="256" />
-		<br>
-		<b>Font Color: </b>
-		<input id="fontColor" type="color" />
-		<br>
-		<b>Background Color: </b>
-		<input id="backgroundColor" type="color" />
-		<br>
+		<div id="content">
+			<h1>Teleprompters</h1>
+			<h4>Playing: </h4>
+			<div class="form-check form-switch">
+				<input class="form-check-input" id="playing" type="checkbox" />
+			</div>
+			<br>
 
+			<h4>Progress: </h4>
+			<input id="progress" type="range" min="0" max="100" value="0"></input>
 
-		<h1>Teleprompters</h1>
+			<h4>Speed: </h4>
+			<input id="speed" type="range" min="0" max="10" step="0.25" />
+			<br>
 
-		<b>Playing: </b>
-		<input id="playing" type="checkbox" />
-		<br>
-		<b>Progress: </b>
-		<input id="progress" type="range" min="0" max="100" value="0"></input>
+			<h1>Text Options</h1>
 
-		
+			<h4>Font:</h4>
+			<select id="font" class="form-select">
+				<option value="Arial">Arial</option>
+				<option value="Courier New">Courier New</option>
+				<option value="Comic Sans MS">Comic Sans MS</option>
+				<option value="Times New Roman">Times New Roman</option>
+				<option value="Verdana">Verdana</option>
+			</select>
+			<br>
+
+			<h4>Font Size: </h4>
+			<input id="fontSize" type="range" min="12" max="256" />
+			<br>
+
+			<div class="fixedOption">
+				<h4>Font Color: </h4>
+				<input id="fontColor" type="color" value="white" class="form-control form-control-color" />
+				<br>
+			</div>
+
+			<div class="fixedOption">
+				<h4>Background Color: </h4>
+				<input id="backgroundColor" type="color" value="black" class="form-control form-control-color" />
+				<br><br>
+			</div>
+
+			<h4>Mirrored: </h4>
+			<div class="form-check form-switch">
+				<input class="form-check-input" id="mirrored" type="checkbox" />
+			</div>
+			<br>
+
+			<h4>Reversed: </h4>
+			<div class="form-check form-switch">
+				<input class="form-check-input" id="reversed" type="checkbox" />
+			</div>
+			<br>
+		</content>
+
+		<script src="./bootstrap.bundle.min.js"></script>
 		<script src="./telemaster.js"></script>
 	</body>
 </html>

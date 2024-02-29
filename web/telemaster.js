@@ -1,4 +1,4 @@
-const socket = new WebSocket("ws://localhost:8080", ["telemaster"])
+const socket = new WebSocket(`ws://${window.location.hostname}/ws`, ["telemaster"])
 
 let clients = []
 let options = {
@@ -8,6 +8,10 @@ let options = {
 	fontSize: 48,
 	fontColor: "white",
 	backgroundColor: "black",
+	
+	mirrored: false,
+	reversed: false,
+
 	playing: false,
 	percent: 0
 }
@@ -37,6 +41,9 @@ socket.addEventListener("message", (event) => {
 	document.querySelector("#backgroundColor").value = options.backgroundColor
 	document.querySelector("#playing").checked = options.playing
 	document.querySelector("#progress").value = options.percent
+	
+	document.querySelector("#mirrored").checked = options.mirrored
+	document.querySelector("#reversed").checked = options.reversed
 })
 
 // Input events
@@ -79,4 +86,14 @@ document.querySelector("#playing").oninput = (event) => {
 document.querySelector("#progress").oninput = (event) => {
 	options.percent = event.target.value
 	socket.send(JSON.stringify({"type": "updateOption", "key": "percent", "value": event.target.value}))
+}
+
+document.querySelector("#mirrored").oninput = (event) => {
+	options.mirrored = event.target.checked
+	socket.send(JSON.stringify({"type": "updateOption", "key": "mirrored", "value": event.target.checked}))
+}
+
+document.querySelector("#reversed").oninput = (event) => {
+	options.reversed = event.target.checked
+	socket.send(JSON.stringify({"type": "updateOption", "key": "reversed", "value": event.target.checked}))
 }

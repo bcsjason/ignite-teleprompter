@@ -1,12 +1,45 @@
+import "dotenv/config"
 import { WebSocketServer } from "ws"
+import express from "express"
+import expressBasicAuth from "express-basic-auth"
 
-const wss = new WebSocketServer({ port: 8080 })
 const log = (message) => console.log(`[${new Date().toLocaleTimeString()}] ${message}`)
 
-const sanitizeClientArray = (clients) => {
-	// This function is used to strip the "ws" and "req" properties from the clients array, so that we can send them over the network.
-	// Telemasters don't need them anyway.
+const app = express()
+const wss = new WebSocketServer({ noServer: true })
+const port = process.env.PORT
 
+// Setup
+if (process.env_REVERSE_PROXY === "TRUE") {
+	app.set("trust proxy", true)
+}
+if (!process.env.PORT) {
+	log("No port set, please set the PORT environment variable")
+	process.exit(1)
+}
+if (!process.env.DEFAULT_PASSWORD) {
+	log("No default password set, please set the DEFAULT_PASSWORD environment variable")
+	process.exit(1)
+}
+
+// Log IPs (prioritize X-Forwarded-For)
+app.use((req, res, next) => {
+	let ip = req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress
+	log(`Request from "${ip}": "${req.method} ${req.url}"`)
+	next()
+})
+
+app.use(expressBasicAuth({
+	// TODO: Implement a better authentication system, not sure what yet though
+    users: { "admin": process.env.DEFAULT_PASSWORD },
+	challenge: true,
+}))
+
+app.use(express.static("./web"))
+
+// This function is used to strip the "ws" and "req" properties from the clients array, so that we can send them over the network.
+// Telemasters don't need them anyway.
+const sanitizeClientArray = (clients) => {
 	return clients.map((client) => {
 		return {
 			id: client.id,
@@ -27,12 +60,16 @@ let options = {
 	fontSize: 48,
 	fontColor: "white",
 	backgroundColor: "black",
+
+	mirrored: false,
+	reversed: false,
+	
 	playing: false,
 	percent: 0
 }
 
 wss.on("connection", (ws, req) => {
-	let ip = req.connection.remoteAddress
+	let ip = req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress
 	let joined = new Date()
 	let type = undefined
 
@@ -126,4 +163,15 @@ wss.on("connection", (ws, req) => {
 			})
 		}
 	})
-});
+})
+
+const server = app.listen(port, () => {
+	console.log(`Ignite teleprompter server listening on port ${port}`)
+})
+
+// Support handling websockets through Express, so we don't have to listen on a separate port
+server.on("upgrade", (req, socket, head) => {
+	wss.handleUpgrade(req, socket, head, (ws) => {
+		wss.emit("connection", ws, req)
+	})
+})

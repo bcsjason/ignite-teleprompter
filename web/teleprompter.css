@@ -4,9 +4,21 @@ body {
 	color-scheme: dark !important;
 	
 	font-family: Arial, sans-serif;
+
+	user-select: none;
+	overflow: hidden;
+	cursor: none;
 }
 
 #text {
 	font-size: 1000%;
 	margin: 0;
+}
+
+.mirrored {
+	transform: scaleX(-1) !important;
+}
+
+.reversed {
+	transform: scaleY(-1) !important;
 }
